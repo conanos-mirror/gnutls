@@ -1,6 +1,7 @@
 from conans import ConanFile, CMake, tools
 import os
-
+import platform
+from conanos.build import config_scheme
 
 class GnutlsConan(ConanFile):
     name = "gnutls"
@@ -13,7 +14,8 @@ class GnutlsConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=True"
     generators = "cmake"
-    requires = "zlib/1.2.11@conanos/dev", "nettle/3.4@conanos/dev", "libtasn1/4.13@conanos/dev", "gmp/6.1.2@conanos/dev"
+
+    requires = "zlib/1.2.11@conanos/stable", "nettle/3.4@conanos/stable", "libtasn1/4.13@conanos/stable", "gmp/6.1.2@conanos/stable"
 
     source_subfolder = "source_subfolder"
 
@@ -33,7 +35,34 @@ class GnutlsConan(ConanFile):
         os.rename('%s-%s' %( self.name, self.version), self.source_subfolder)
         os.unlink(archive_name)
 
+    def configure(self):
+        del self.settings.compiler.libcxx
+
+        config_scheme(self)
+
+    def build_requirements(self):
+        if platform.system() == "Windows":
+            self.build_requires("7z_installer/1.0@conan/stable")
+
     def build(self):
+        if self.settings.compiler == 'Visual Studio':
+            self.msvc_build()
+        else:
+            self.gcc_build()
+
+    def msvc_build(self):
+        GNUTLS_PROJECT_DIR = os.path.abspath(self.source_subfolder).replace('\\','/')
+        cmake = CMake(self)
+        cmake.configure(build_folder='~build',
+        defs={'USE_CONAN_IO':True,
+            'GNUTLS_PROJECT_DIR':GNUTLS_PROJECT_DIR,            
+            'ENABLE_UNIT_TESTS':'ON' if os.environ.get('CONANOS_BUILD_TESTS') else 'OFF'
+        })
+        cmake.build()
+        #cmake.test()
+        cmake.install()
+
+    def gcc_build(self):
         with tools.chdir(self.source_subfolder):
             with tools.environment_append({
                 'PKG_CONFIG_PATH':'%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig'
