@@ -53,8 +53,8 @@ include_directories(${GNUTLS_PROJECT_DIR}
 					${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/lib/unistring                 
                     ${CMAKE_CURRENT_BINARY_DIR}
 					)
-set(msvcd_ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc)
-file(GLOB_RECURSE  msvc_SOURCES_ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/*/*.c)
+#set(msvcd_ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc)
+#file(GLOB_RECURSE  msvc_SOURCES_ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/*/*.c)
 	   
 
 set(SOURCES_ 
@@ -208,7 +208,7 @@ set(SOURCES_
     lib/pk.c
     lib/pkix_asn1_tab.c
     lib/prf.c
-    lib/priority.c
+    #lib/priority.c
     lib/privkey.c
     lib/privkey_raw.c
     lib/psk.c
@@ -326,7 +326,7 @@ set(SOURCES_
     lib/unistring/unistr/u8-uctomb.c
     lib/urls.c
     lib/verify-tofu.c
-    lib/x509.c
+    #lib/x509.c
     lib/x509/attributes.c
     lib/x509/common.c
     lib/x509/crl.c

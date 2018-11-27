@@ -1,7 +1,11 @@
 from conans import ConanFile, CMake, tools
 import os
 import platform
-from conanos.build import config_scheme
+from conanos.build import config_scheme,pkgconfig_adaption
+
+
+def _abspath(folder):
+    return os.path.abspath(folder).replace('\\','/')
 
 class GnutlsConan(ConanFile):
     name = "gnutls"
@@ -17,7 +21,13 @@ class GnutlsConan(ConanFile):
 
     requires = "zlib/1.2.11@conanos/stable", "nettle/3.4@conanos/stable", "libtasn1/4.13@conanos/stable", "gmp/6.1.2@conanos/stable"
 
-    source_subfolder = "source_subfolder"
+    _source_folder    ='_source'
+    _pkgconfig_folder ='_pkgconfig'
+    _build_folder     ='_build'
+
+    @property
+    def is_msvc(self):
+        return self.settings.compiler == 'Visual Studio'
 
     def source(self):
         maj_ver = '.'.join(self.version.split('.')[0:2])
@@ -32,12 +42,13 @@ class GnutlsConan(ConanFile):
             os.unlink(tarball_name)
         else:
             self.run('tar -xJf %s' % archive_name)
-        os.rename('%s-%s' %( self.name, self.version), self.source_subfolder)
+        os.rename('%s-%s' %( self.name, self.version), self._source_folder)
         os.unlink(archive_name)
 
     def configure(self):
         del self.settings.compiler.libcxx
 
+    def requirements(self):
         config_scheme(self)
 
     def build_requirements(self):
@@ -45,15 +56,17 @@ class GnutlsConan(ConanFile):
             self.build_requires("7z_installer/1.0@conan/stable")
 
     def build(self):
-        if self.settings.compiler == 'Visual Studio':
+        pkgconfig_adaption(self,_abspath(self._source_folder))
+        
+        if self.is_msvc:
             self.msvc_build()
         else:
             self.gcc_build()
 
     def msvc_build(self):
-        GNUTLS_PROJECT_DIR = os.path.abspath(self.source_subfolder).replace('\\','/')
+        GNUTLS_PROJECT_DIR = _abspath(self._source_folder)
         cmake = CMake(self)
-        cmake.configure(build_folder='~build',
+        cmake.configure(build_folder=self._build_folder,
         defs={'USE_CONAN_IO':True,
             'GNUTLS_PROJECT_DIR':GNUTLS_PROJECT_DIR,            
             'ENABLE_UNIT_TESTS':'ON' if os.environ.get('CONANOS_BUILD_TESTS') else 'OFF'
