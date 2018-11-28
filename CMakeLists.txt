@@ -3,8 +3,9 @@ project (GnuTLS C)
 set (MAJOR_VERSION 3)
 set (MINOR_VERSION 5)
 set (VERSION_PATCH 19)
+set (PATCH_VERSION ${VERSION_PATCH})
 set (VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${VERSION_PATCH})
-
+set (NUMBER_VERSION "(${MAJOR_VERSION}<<16|${MINOR_VERSION}<<8|${VERSION_PATCH})")
 OPTION(ENABLE_UNIT_TESTS "enable test ..." ON)
 
 if(NOT GNUTLS_PROJECT_DIR)
@@ -36,19 +37,12 @@ if(MSVC)
                  ${GNUTLS_PROJECT_DIR}/lib/includes/gnutls/gnutls.h @ONLY)
 endif() 
 
-add_definitions(-DHAVE_CONFIG_H
-				#-DHAVE_LIBNETTLE
-				#-DHAVE_SYS_SOCKET_H
-				#-D_GL_INLINE_HEADER_BEGIN=
-				#-D_GL_INLINE_HEADER_END=
-				#-D_GL_EXTERN_INLINE=inline
-				#-D_GL_INLINE=inline
-				#-D_GL_ATTRIBUTE_PURE=
-				#-DENABLE_OPENPGP
-				)
+add_definitions(-DHAVE_CONFIG_H	)
 
-set(lib_sub_folders unistring system openpgp opencdk 
-      #nettle minitasn1
+set(lib_sub_folders .
+      unistring  unistring/uninorm unistring/unistr unistring/unictype
+	  system openpgp opencdk 
+      nettle nettle/int #minitasn1
       extras ext auth algorithms 
       accelerated accelerated/x86 x509)
 
@@ -62,17 +56,63 @@ include_directories(${GNUTLS_PROJECT_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/gnu
 	${CMAKE_CURRENT_BINARY_DIR}
-	${GNUTLS_PROJECT_DIR}/lib/nettle
+	#${GNUTLS_PROJECT_DIR}/lib/nettle
+	#${GNUTLS_PROJECT_DIR}/lib/nettle/int
 	${GNUTLS_PROJECT_DIR}/lib/minitasn1
 	)
-set(patches_ lib/algorithms/ciphersuites.c
-             lib/algorithms/protocols.c)
-set(ignores_ lib/system/keys-dummy.c)
+	
+set(patches_ lib/priority.c
+             lib/x509.c
+             lib/algorithms/ciphersuites.c
+             lib/algorithms/protocols.c
+			 lib/nettle/int/provable-prime.c)
+			 
+			 
+set(ignores_ lib/pkcs11_secret.c
+			 lib/pkcs11.c
+			 lib/pkcs11x.c
+			 lib/pkcs11_privkey.c
+			 lib/pkcs11_int.c
+			 lib/pkcs11_write.c
+             lib/system/keys-dummy.c
+             lib/nettle/sysrng-linux.c )
 
-set(lib_SOURCES_)
+
+#set(__lib_root_sources_  alert.c anon_cred.c atfork.c auth.c
+#    buffers.c cert.c cipher.c cipher_int.c compress.c constate.c
+#    datum.c db.c debug.c dh.c dtls.c ecc.c errors.c extensions.c 
+#    file.c fingerprint.c fips.c global.c gnutls_asn1_tab.c handshake.c 
+#    hash_int.c kx.c locks.c mbuffers.c mem.c mpi.c num.c openpgp_compat.c
+#    pcert.c pin.c pk.c pkix_asn1_tab.c prf.c privkey.c privkey_raw.c 
+#    psk.c pubkey.c random.c randomart.c range.c record.c session.c 
+#    session_pack.c srp.c sslv2_compat.c state.c str.c str-iconv.c str-unicode.c
+#	supplemental.c  safe-memfuncs.c crypto-backend.c
+#    system.c system_override.c tpm.c urls.c  x509_b64.c
+#	str-idna.c
+#	)
+#	
+#set(lib_root_sources_)
+#	
+#file(GLOB srcs_ ${GNUTLS_PROJECT_DIR}/lib/*.c)
+#
+#
+#
+#foreach(name ${lib_root_sources_})
+#   set(lib_SOURCES_ ${lib_SOURCES_} ${GNUTLS_PROJECT_DIR}/lib/${name})
+#endforeach()
+#set(lib_SOURCES_ ${lib_SOURCES_} 
+#   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/patches/lib/priority.c
+#   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/patches/lib/x509.c
+#   )
+
 foreach(folder ${lib_sub_folders})
-   include_directories(${GNUTLS_PROJECT_DIR}/lib/${folder})
-   file(GLOB SOURCES_ ${GNUTLS_PROJECT_DIR}/lib/${folder}/*.c)
+   if(${folder} STREQUAL ".")
+   	   include_directories(${GNUTLS_PROJECT_DIR}/lib)
+	   file(GLOB SOURCES_ ${GNUTLS_PROJECT_DIR}/lib/*.c)
+   else()
+	   include_directories(${GNUTLS_PROJECT_DIR}/lib/${folder})
+	   file(GLOB SOURCES_ ${GNUTLS_PROJECT_DIR}/lib/${folder}/*.c)
+   endif()
    
    set(rlist_)
    # replace patches file 
@@ -91,12 +131,13 @@ foreach(folder ${lib_sub_folders})
 
    endforeach()
    if(rlist_)
+     
      list(REMOVE_ITEM SOURCES_ ${rlist_})
    endif()
    
+   
    set(lib_SOURCES_ ${lib_SOURCES_} ${SOURCES_})
 endforeach()
-
 
 
 file(GLOB gl_SOURCES_ 
@@ -116,9 +157,13 @@ endforeach()
 set(gnutls_SOURCES ${gnutls_SOURCES} ${gl_SOURCES_} ${lib_SOURCES_})
 
 add_library(gnutls STATIC ${gnutls_SOURCES} ${msvc_SOURCES_})
+#if(MSVC)
+#  target_link_libraries(gnutls Crypt32.lib ws2_32.lib)
+#endif()
+#Crypt32.lib
 assign_source_group(${gnutls_SOURCES})
 
-install(DIRECTORY  ${GNUTLS_PROJECT_DIR}/lib/includes DESTINATION include)
+install(DIRECTORY  ${GNUTLS_PROJECT_DIR}/lib/includes/gnutls DESTINATION include)
 INSTALL(TARGETS gnutls
        RUNTIME DESTINATION bin
        LIBRARY DESTINATION lib

@@ -9,7 +9,7 @@ def _abspath(folder):
 
 class GnutlsConan(ConanFile):
     name = "gnutls"
-    version = "3.5.18"
+    version = "3.5.19"
     description = "GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
     url = "https://github.com/conanos/gnutls"
     homepage = "https://www.gnutls.org/"
@@ -18,6 +18,8 @@ class GnutlsConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=True"
     generators = "cmake"
+
+    exports_sources = ['CMakeLists.txt','cmake/*']
 
     requires = "zlib/1.2.11@conanos/stable", "nettle/3.4@conanos/stable", "libtasn1/4.13@conanos/stable", "gmp/6.1.2@conanos/stable"
 
@@ -29,6 +31,13 @@ class GnutlsConan(ConanFile):
     def is_msvc(self):
         return self.settings.compiler == 'Visual Studio'
 
+    @property
+    def run_checks(self):
+        CONANOS_RUN_CHECKS = os.environ.get('CONANOS_RUN_CHECKS')
+        if CONANOS_RUN_CHECKS:
+            return self.name in CONANOS_RUN_CHECKS.split()
+        return False
+		
     def source(self):
         maj_ver = '.'.join(self.version.split('.')[0:2])
         tarball_name = '{name}-{version}.tar'.format(name=self.name, version=self.version)
@@ -46,7 +55,11 @@ class GnutlsConan(ConanFile):
         os.unlink(archive_name)
 
     def configure(self):
-        del self.settings.compiler.libcxx
+        del self.settings.compiler.libcxx	
+        if self.is_msvc:
+            del self.options.fPIC
+            if self.options.shared:
+               raise tools.ConanException("The gmp package cannot be built shared on Visual Studio.")
 
     def requirements(self):
         config_scheme(self)
@@ -67,12 +80,14 @@ class GnutlsConan(ConanFile):
         GNUTLS_PROJECT_DIR = _abspath(self._source_folder)
         cmake = CMake(self)
         cmake.configure(build_folder=self._build_folder,
-        defs={'USE_CONAN_IO':True,
+          source_folder='.',
+          defs={'USE_CONAN_IO':True,
             'GNUTLS_PROJECT_DIR':GNUTLS_PROJECT_DIR,            
-            'ENABLE_UNIT_TESTS':'ON' if os.environ.get('CONANOS_BUILD_TESTS') else 'OFF'
+            'ENABLE_UNIT_TESTS': self.run_checks
         })
         cmake.build()
-        #cmake.test()
+        if self.run_checks:
+            cmake.test()
         cmake.install()
 
     def gcc_build(self):
@@ -105,3 +120,6 @@ class GnutlsConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
+        if self.is_msvc:
+            self.cpp_info.libs.append("Crypt32")
+            self.cpp_info.libs.append("ws2_32")

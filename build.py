@@ -2,4 +2,4 @@
 from conanos.build import Main
 
 if __name__ == "__main__":    
-    Main('nettle',pure_c=True)
+    Main('gnutls',pure_c=True)
