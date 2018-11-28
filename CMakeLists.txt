@@ -1,22 +1,39 @@
 cmake_minimum_required (VERSION 3.1)
 project (GnuTLS C)
 set (MAJOR_VERSION 3)
-set (MINOR_VERSION 4)
-set (VERSION_PATCH 0)
-set (VERSION 3.4)
+set (MINOR_VERSION 5)
+set (VERSION_PATCH 19)
+set (VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${VERSION_PATCH})
 
 OPTION(ENABLE_UNIT_TESTS "enable test ..." ON)
 
 if(NOT GNUTLS_PROJECT_DIR)
   set(GNUTLS_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/gnutls-${VERSION})
 endif()
-
+message(STATUS "source : ${GNUTLS_PROJECT_DIR}")
 include(cmake/conanos.cmake)
-#include(cmake/config.cmake)
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.cmakein
-#               ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
- 
+foreach(name unictype uninorm unistr unitypes)
+  configure_file(${GNUTLS_PROJECT_DIR}/lib/unistring/${name}.in.h
+      ${GNUTLS_PROJECT_DIR}/lib/unistring/${name}.h @ONLY)
+endforeach()               
+
+if(MSVC)
+  string(JOIN "\n" DEFINE_SSIZE_T 
+         "#include <sys/types.h>"
+         "#include <basetsd.h>"
+         "typedef SSIZE_T ssize_t;")
+         
+  string(JOIN "\n" DEFINE_IOVEC_T 
+         "typedef struct {"
+         "  void *iov_base;"
+         "  size_t iov_len;"
+         "} giovec_t;")
+  
+  configure_file(${GNUTLS_PROJECT_DIR}/lib/includes/gnutls/gnutls.h.in
+    ${GNUTLS_PROJECT_DIR}/lib/includes/gnutls/gnutls.h)
+endif() 
+
 add_definitions(-DHAVE_CONFIG_H
 				#-DHAVE_LIBNETTLE
 				#-DHAVE_SYS_SOCKET_H
@@ -27,6 +44,23 @@ add_definitions(-DHAVE_CONFIG_H
 				#-D_GL_ATTRIBUTE_PURE=
 				#-DENABLE_OPENPGP
 				)
+
+set(lib_sub_folders_ unistring system openpgp opencdk 
+      #nettle minitasn1
+      extras ext auth algorithms 
+      accelerated accelerated/x86 x509)
+
+
+
+
+
+
+
+
+
+
+
+
 
 include_directories(${GNUTLS_PROJECT_DIR}/lib	
 	${GNUTLS_PROJECT_DIR}/lib/includes	
