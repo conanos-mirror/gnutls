@@ -1,10 +1,15 @@
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, CMake, tools,AutoToolsBuildEnvironment
 import os
+import platform
+from conanos.build import config_scheme,pkgconfig_adaption
 
+
+def _abspath(folder):
+    return os.path.abspath(folder).replace('\\','/')
 
 class GnutlsConan(ConanFile):
     name = "gnutls"
-    version = "3.5.18"
+    version = "3.5.19"
     description = "GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
     url = "https://github.com/conanos/gnutls"
     homepage = "https://www.gnutls.org/"
@@ -13,10 +18,26 @@ class GnutlsConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=True"
     generators = "cmake"
-    requires = "zlib/1.2.11@conanos/dev", "nettle/3.4@conanos/dev", "libtasn1/4.13@conanos/dev", "gmp/6.1.2@conanos/dev"
 
-    source_subfolder = "source_subfolder"
+    exports_sources = ['CMakeLists.txt','cmake/*']
 
+    requires = "zlib/1.2.11@conanos/stable", "nettle/3.4@conanos/stable", "libtasn1/4.13@conanos/stable", "gmp/6.1.2@conanos/stable"
+
+    _source_folder    ='_source'
+    _pkgconfig_folder ='_pkgconfig'
+    _build_folder     ='_build'
+
+    @property
+    def is_msvc(self):
+        return self.settings.compiler == 'Visual Studio'
+
+    @property
+    def run_checks(self):
+        CONANOS_RUN_CHECKS = os.environ.get('CONANOS_RUN_CHECKS')
+        if CONANOS_RUN_CHECKS:
+            return self.name in CONANOS_RUN_CHECKS.split()
+        return False
+		
     def source(self):
         maj_ver = '.'.join(self.version.split('.')[0:2])
         tarball_name = '{name}-{version}.tar'.format(name=self.name, version=self.version)
@@ -30,11 +51,66 @@ class GnutlsConan(ConanFile):
             os.unlink(tarball_name)
         else:
             self.run('tar -xJf %s' % archive_name)
-        os.rename('%s-%s' %( self.name, self.version), self.source_subfolder)
+        os.rename('%s-%s' %( self.name, self.version), self._source_folder)
         os.unlink(archive_name)
 
+    def configure(self):
+        del self.settings.compiler.libcxx	
+        if self.is_msvc:
+            del self.options.fPIC
+            if self.options.shared:
+               raise tools.ConanException("The gnutls package cannot be built shared on Visual Studio.")
+
+    def requirements(self):
+        config_scheme(self)
+
+    def build_requirements(self):
+        if platform.system() == "Windows":
+            self.build_requires("7z_installer/1.0@conan/stable")
+
     def build(self):
-        with tools.chdir(self.source_subfolder):
+        pkgconfig_adaption(self,_abspath(self._pkgconfig_folder))
+        
+        if self.is_msvc:
+            self.msvc_build()
+        else:
+            #self.gcc_build()
+            self.autotool_build()
+
+    def msvc_build(self):
+
+        cmake = CMake(self)
+        cmake.configure(build_folder=self._build_folder,
+          source_folder='.',
+          defs={'USE_CONAN_IO':True,
+            'PROJECT_HOME_DIR':_abspath(self._pkgconfig_folder),            
+            'ENABLE_TESTS': self.run_checks
+        })
+        cmake.build()
+        if self.run_checks:
+            cmake.test()
+        cmake.install()
+
+    def autotool_build(self):
+        with tools.chdir(self._source_folder):
+            #self.run('autoreconf')
+            env_build = AutoToolsBuildEnvironment(self)
+            _args = ["--enable-introspection", "--enable-local-libopts", "--disable-guile", 
+                     "--disable-openssl-compatibility","--without-p11-kit", "--enable-zlib", 
+                     "--disable-doc", "--disable-tests", "--with-included-unistring",
+                     "--disable-tools"]
+            
+            if self.options.shared:
+                _args.extend(['--enable-shared=yes','--enable-static=no'])
+            else:
+                _args.extend(['--enable-shared=no','--enable-static=yes'])
+
+            env_build.configure(args=_args, pkg_config_paths=_abspath(self._pkgconfig_folder))
+            env_build.make()
+            env_build.install()
+
+    def gcc_build(self):
+        with tools.chdir(self._source_folder):
             with tools.environment_append({
                 'PKG_CONFIG_PATH':'%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig'
                 %(self.deps_cpp_info["zlib"].rootpath,self.deps_cpp_info["nettle"].rootpath,
@@ -58,8 +134,11 @@ class GnutlsConan(ConanFile):
 
     def package(self):
         if tools.os_info.is_linux:
-            with tools.chdir(self.source_subfolder):
+            with tools.chdir(self._source_folder):
                 self.copy("*", src="%s/builddir"%(os.getcwd()))
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
+        if self.is_msvc:
+            self.cpp_info.libs.append("Crypt32")
+            self.cpp_info.libs.append("ws2_32")
