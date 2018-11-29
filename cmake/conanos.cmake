@@ -32,6 +32,7 @@ if(MSVC)
   add_definitions(/wd4996)
   add_definitions(/wd4028)
   add_definitions(/wd4047)
+  add_definitions(/wd4116)
 endif()
 
 

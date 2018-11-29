@@ -77,13 +77,13 @@ class GnutlsConan(ConanFile):
             self.gcc_build()
 
     def msvc_build(self):
-        GNUTLS_PROJECT_DIR = _abspath(self._source_folder)
+
         cmake = CMake(self)
         cmake.configure(build_folder=self._build_folder,
           source_folder='.',
           defs={'USE_CONAN_IO':True,
-            'GNUTLS_PROJECT_DIR':GNUTLS_PROJECT_DIR,            
-            'ENABLE_UNIT_TESTS': self.run_checks
+            'PROJECT_HOME_DIR':_abspath(self._source_folder),            
+            'ENABLE_TESTS': self.run_checks
         })
         cmake.build()
         if self.run_checks:

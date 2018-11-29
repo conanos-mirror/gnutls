@@ -1,4 +1,5 @@
-
+#ifndef _GNUTLS_CONFIG_H_
+#define _GNUTLS_CONFIG_H_
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
 
@@ -2247,3 +2248,19 @@
 
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */
+
+
+
+//#ifdef IN_GNUTLS_TESTS
+//#ifdef _WIN32
+////#include <Windows.h>
+//inline static int sleep(int sec)
+//{
+//    Sleep((DWORD)(sec * 1000));
+//    return 0;
+//}
+//#endif
+//#endif // IN_GNUTLS_TESTS
+
+#endif //_GNUTLS_CONFIG_H_
+
