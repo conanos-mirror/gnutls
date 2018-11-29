@@ -91,7 +91,7 @@ class GnutlsConan(ConanFile):
         cmake.install()
 
     def gcc_build(self):
-        with tools.chdir(self.source_subfolder):
+        with tools.chdir(self._source_folder):
             with tools.environment_append({
                 'PKG_CONFIG_PATH':'%s/lib/pkgconfig:%s/lib/pkgconfig:%s/lib/pkgconfig'
                 %(self.deps_cpp_info["zlib"].rootpath,self.deps_cpp_info["nettle"].rootpath,
@@ -115,7 +115,7 @@ class GnutlsConan(ConanFile):
 
     def package(self):
         if tools.os_info.is_linux:
-            with tools.chdir(self.source_subfolder):
+            with tools.chdir(self._source_folder):
                 self.copy("*", src="%s/builddir"%(os.getcwd()))
 
     def package_info(self):
