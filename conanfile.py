@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, CMake, tools,AutoToolsBuildEnvironment
 import os
 import platform
 from conanos.build import config_scheme,pkgconfig_adaption
@@ -69,12 +69,13 @@ class GnutlsConan(ConanFile):
             self.build_requires("7z_installer/1.0@conan/stable")
 
     def build(self):
-        pkgconfig_adaption(self,_abspath(self._source_folder))
+        pkgconfig_adaption(self,_abspath(self._pkgconfig_folder))
         
         if self.is_msvc:
             self.msvc_build()
         else:
-            self.gcc_build()
+            #self.gcc_build()
+            self.autotool_build()
 
     def msvc_build(self):
 
@@ -82,13 +83,31 @@ class GnutlsConan(ConanFile):
         cmake.configure(build_folder=self._build_folder,
           source_folder='.',
           defs={'USE_CONAN_IO':True,
-            'PROJECT_HOME_DIR':_abspath(self._source_folder),            
+            'PROJECT_HOME_DIR':_abspath(self._pkgconfig_folder),            
             'ENABLE_TESTS': self.run_checks
         })
         cmake.build()
         if self.run_checks:
             cmake.test()
         cmake.install()
+
+    def autotool_build(self):
+        with tools.chdir(self._source_folder):
+            #self.run('autoreconf')
+            env_build = AutoToolsBuildEnvironment(self)
+            _args = ["--enable-introspection", "--enable-local-libopts", "--disable-guile", 
+                     "--disable-openssl-compatibility","--without-p11-kit", "--enable-zlib", 
+                     "--disable-doc", "--disable-tests", "--with-included-unistring",
+                     "--disable-tools"]
+            
+            if self.options.shared:
+                _args.extend(['--enable-shared=yes','--enable-static=no'])
+            else:
+                _args.extend(['--enable-shared=no','--enable-static=yes'])
+
+            env_build.configure(args=_args, pkg_config_paths=_abspath(self._pkgconfig_folder))
+            env_build.make()
+            env_build.install()
 
     def gcc_build(self):
         with tools.chdir(self._source_folder):
