@@ -59,7 +59,7 @@ class GnutlsConan(ConanFile):
         if self.is_msvc:
             del self.options.fPIC
             if self.options.shared:
-               raise tools.ConanException("The gmp package cannot be built shared on Visual Studio.")
+               raise tools.ConanException("The gnutls package cannot be built shared on Visual Studio.")
 
     def requirements(self):
         config_scheme(self)

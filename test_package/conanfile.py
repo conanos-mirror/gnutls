@@ -20,4 +20,4 @@ class GnutlsTestConan(ConanFile):
     def test(self):
         if not tools.cross_building(self.settings):
             with tools.chdir("bin"):
-                self.run(".%test_package" % os.sep)
+                self.run(".%stest_package" % os.sep)
