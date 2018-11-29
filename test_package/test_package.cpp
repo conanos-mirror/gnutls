@@ -25,7 +25,7 @@
 		exit(1); \
 	}
 
-void main(void)
+int main(void)
 {
 	printf("GnuTLS header version %s.\n", GNUTLS_VERSION);
 	printf("GnuTLS library version %s.\n",gnutls_check_version(NULL));
@@ -41,5 +41,6 @@ void main(void)
 	CHECK_OK(2, 0, 0)
 	CHECK_OK(2, 99, 99)
 	CHECK_OK(3, 0, 0)
+	return 0;
 
 }
