@@ -162,7 +162,7 @@ if(ENABLE_TESTS )
 
   add_library(libutils STATIC ${THOME_}/seccomp.c ${THOME_}/utils-adv.c
   ${THOME_}/common-cert-key-exchange.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/patches/lib/tests/utils.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/patches/tests/utils.c)
   target_compile_definitions(libutils PRIVATE IN_GNUTLS_TESTS)
   
   include_directories(${THOME_})
@@ -287,7 +287,7 @@ message(STATUS "GnuTLS Tests")
 foreach(name ${CTESTS_})
   make_test(${name})  
 endforeach()
-set(PTEST_ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/patches/lib/tests)
+set(PTEST_ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc/patches/tests)
 make_test(dtls1-2-mtu-check ${PTEST_})  
 
 endif()
