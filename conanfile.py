@@ -83,7 +83,7 @@ class GnutlsConan(ConanFile):
         cmake.configure(build_folder=self._build_folder,
           source_folder='.',
           defs={'USE_CONAN_IO':True,
-            'PROJECT_HOME_DIR':_abspath(self._pkgconfig_folder),            
+            'PROJECT_HOME_DIR':_abspath(self._source_folder),            
             'ENABLE_TESTS': self.run_checks
         })
         cmake.build()
