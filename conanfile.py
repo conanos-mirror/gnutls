@@ -92,6 +92,7 @@ class GnutlsConan(ConanFile):
         cmake.install()
 
     def autotool_build(self):
+        pkg_config_paths=[_abspath(self._pkgconfig_folder)]
         with tools.chdir(self._source_folder):
             #self.run('autoreconf')
             env_build = AutoToolsBuildEnvironment(self)
@@ -105,7 +106,7 @@ class GnutlsConan(ConanFile):
             else:
                 _args.extend(['--enable-shared=no','--enable-static=yes'])
 
-            env_build.configure(args=_args, pkg_config_paths=_abspath(self._pkgconfig_folder))
+            env_build.configure(args=_args, pkg_config_paths=pkg_config_paths)
             env_build.make()
             env_build.install()
 
