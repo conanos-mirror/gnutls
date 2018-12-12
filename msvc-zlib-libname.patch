@@ -1,0 +1,111 @@
+diff -Nur gnutls-gnutls_3_5_19-2/SMP/libgnutls.vcxproj gnutls-gnutls_3_5_19-2-zlib/SMP/libgnutls.vcxproj
+--- gnutls-gnutls_3_5_19-2/SMP/libgnutls.vcxproj	2018-12-08 05:36:14.000000000 -0800
++++ gnutls-gnutls_3_5_19-2-zlib/SMP/libgnutls.vcxproj	2018-12-12 01:40:41.216323837 -0800
+@@ -1030,7 +1030,7 @@
+       <OutputFile>$(OutDir)\lib\x86\$(TargetName)$(TargetExt)</OutputFile>
+       <TargetMachine>MachineX86</TargetMachine>
+       <SubSystem>Windows</SubSystem>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlibd.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+     </Lib>
+@@ -1147,7 +1147,7 @@
+       <OutputFile>$(OutDir)\lib\x64\$(TargetName)$(TargetExt)</OutputFile>
+       <TargetMachine>MachineX64</TargetMachine>
+       <SubSystem>Windows</SubSystem>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlibd.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+     </Lib>
+@@ -1265,7 +1265,7 @@
+       <ImportLibrary>$(OutDir)\lib\x86\$(TargetName).lib</ImportLibrary>
+       <ProfileGuidedDatabase>$(IntDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+       <ModuleDefinitionFile>libgnutls.def</ModuleDefinitionFile>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlibd.lib;hogweedd.lib;gmpd.lib;nettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;hogweedd.lib;gmpd.lib;nettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <LargeAddressAware>true</LargeAddressAware>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -1386,7 +1386,7 @@
+       <ImportLibrary>$(OutDir)\lib\x86\$(TargetName).lib</ImportLibrary>
+       <ProfileGuidedDatabase>$(IntDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+       <ModuleDefinitionFile>libgnutls.def</ModuleDefinitionFile>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlibd.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <LargeAddressAware>true</LargeAddressAware>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -1506,7 +1506,7 @@
+       <ImportLibrary>$(OutDir)\lib\x64\$(TargetName).lib</ImportLibrary>
+       <ProfileGuidedDatabase>$(IntDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+       <ModuleDefinitionFile>libgnutls.def</ModuleDefinitionFile>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlibd.lib;hogweedd.lib;gmpd.lib;nettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;hogweedd.lib;gmpd.lib;nettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+@@ -1625,7 +1625,7 @@
+       <ImportLibrary>$(OutDir)\lib\x64\$(TargetName).lib</ImportLibrary>
+       <ProfileGuidedDatabase>$(IntDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+       <ModuleDefinitionFile>libgnutls.def</ModuleDefinitionFile>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlibd.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweedd.lib;libgmpd.lib;libnettled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+@@ -1753,7 +1753,7 @@
+       <OutputFile>$(OutDir)\lib\x86\$(TargetName)$(TargetExt)</OutputFile>
+       <TargetMachine>MachineX86</TargetMachine>
+       <SubSystem>Windows</SubSystem>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+     </Lib>
+@@ -1878,7 +1878,7 @@
+       <OutputFile>$(OutDir)\lib\x86\$(TargetName)$(TargetExt)</OutputFile>
+       <TargetMachine>MachineX86</TargetMachine>
+       <SubSystem>Windows</SubSystem>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+     </Lib>
+@@ -2003,7 +2003,7 @@
+       <OutputFile>$(OutDir)\lib\x64\$(TargetName)$(TargetExt)</OutputFile>
+       <TargetMachine>MachineX64</TargetMachine>
+       <SubSystem>Windows</SubSystem>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+     </Lib>
+@@ -2128,7 +2128,7 @@
+       <OutputFile>$(OutDir)\lib\x64\$(TargetName)$(TargetExt)</OutputFile>
+       <TargetMachine>MachineX64</TargetMachine>
+       <SubSystem>Windows</SubSystem>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+     </Lib>
+@@ -2379,7 +2379,7 @@
+       <ImportLibrary>$(OutDir)\lib\x86\$(TargetName).lib</ImportLibrary>
+       <ProfileGuidedDatabase>$(IntDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+       <ModuleDefinitionFile>libgnutls.def</ModuleDefinitionFile>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x86\;$(ProjectDir)\..\..\prebuilt\lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <LargeAddressAware>true</LargeAddressAware>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+@@ -2632,7 +2632,7 @@
+       <ImportLibrary>$(OutDir)\lib\x64\$(TargetName).lib</ImportLibrary>
+       <ProfileGuidedDatabase>$(IntDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+       <ModuleDefinitionFile>libgnutls.def</ModuleDefinitionFile>
+-      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;libzlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>Crypt32.lib;Ws2_32.lib;zlib.lib;libhogweed.lib;libgmp.lib;libnettle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalLibraryDirectories>$(OutDir)\lib\x64\;$(ProjectDir)\..\..\prebuilt\lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalOptions>/IGNORE:4006,4221,4042 %(AdditionalOptions)</AdditionalOptions>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
