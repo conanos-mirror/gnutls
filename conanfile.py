@@ -1,6 +1,7 @@
 from conans import ConanFile,tools,AutoToolsBuildEnvironment,MSBuild
 import os
 import platform
+import shutil
 from conanos.build import config_scheme
 
 
@@ -33,6 +34,9 @@ class GnutlsConan(ConanFile):
         self.requires.add("zlib/1.2.11@conanos/stable")
         self.requires.add("nettle/3.4.1@conanos/stable")
         self.requires.add("gmp/6.1.2-5@conanos/stable")
+
+    def build_requirements(self):
+        self.build_requires("glib/2.58.1@conanos/stable")
 
     def source(self):
         url_ = "https://github.com/ShiftMediaProject/gnutls/archive/gnutls_{version}.tar.gz"
@@ -135,6 +139,35 @@ class GnutlsConan(ConanFile):
             for i in ["lib","bin"]:
                 self.copy("*", dst=os.path.join(self.package_folder,i), src=os.path.join(self.build_folder,"..","msvc",i,rplatform))
             self.copy("*", dst=os.path.join(self.package_folder,"licenses"), src=os.path.join(self.build_folder,"..", "msvc","licenses"))
+
+            tools.mkdir(os.path.join(self.package_folder,"lib","pkgconfig"))
+            shutil.copyfile(os.path.join(self.build_folder,self._source_subfolder,"lib","gnutls.pc.in"),
+                            os.path.join(self.package_folder,"lib","pkgconfig", "gnutls.pc"))
+            replacements_pc = {
+                "@prefix@"      : self.package_folder,
+                "@exec_prefix@" : "${prefix}/bin",
+                "@libdir@"      : "${prefix}/lib",
+                "@includedir@"  : "${prefix}/include",
+                "@VERSION@"     : self.version,
+                "@LIBZ_PC@"       : "",
+                "@LIBINTL@"       : "",
+                "@LIBSOCKET@"     : "-lws2_32",
+                "@LIBNSL@"        : "",
+                "@LIBPTHREAD@"    : "",
+                "@LIB_SELECT@"    : "-lws2_32",
+                "@TSS_LIBS@"      : "-lCrypt32",
+                "@GMP_LIBS@"      : "",
+                "@LIBUNISTRING@"  : "",
+                "@LIBIDN2_LIBS@"  : "",
+                "@GNUTLS_REQUIRES_PRIVATE@" : "Requires.private: nettle, hogweed, zlib",
+                "-lgnutls" : "-lgnutls -lintl"
+            }
+            if self.options.shared:
+                replacements_pc.update({
+                    "-lgnutls" : "-lgnutlsd -lintl"
+                })
+            for s, r in replacements_pc.items():
+                tools.replace_in_file(os.path.join(self.package_folder,"lib","pkgconfig", "gnutls.pc"),s,r)
         #if tools.os_info.is_linux:
         #    with tools.chdir(self._source_folder):
         #        self.copy("*", src="%s/builddir"%(os.getcwd()))
