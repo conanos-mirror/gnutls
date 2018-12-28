@@ -7,7 +7,8 @@ from conanos.build import config_scheme
 
 class GnutlsConan(ConanFile):
     name = "gnutls"
-    version = "3.5.19-2"
+    version = "3.5.19"
+    subversion = "2"
     description = "GnuTLS is a secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
     url = "https://github.com/conanos/gnutls"
     homepage = "https://www.gnutls.org/"
@@ -40,7 +41,7 @@ class GnutlsConan(ConanFile):
 
     def source(self):
         url_ = "https://github.com/ShiftMediaProject/gnutls/archive/gnutls_{version}.tar.gz"
-        version_ = self.version.replace('.','_')
+        version_ = (self.version+"-"+self.subversion).replace('.','_')
         tools.get(url_.format(version=version_))
         if self.settings.os == "Windows":
             tools.patch(patch_file=self.patch)
